@@ -13,7 +13,7 @@ def search():
 	keyword = request.args.get('keyword')
 	
 	payload = {'query':{'match_phrase':{'text':keyword}}}
-	r = requests.get('http://localhost:9200/tweetmaps/tweets/_search', json = payload)
+	r = requests.get('http://52.1.34.124:9200/tweetmaps/tweets/_search', json = payload)
 	return r.text
 
 @application.route('/surround')
@@ -36,9 +36,9 @@ def surround():
 	    }
 	  }
 	}
-	r = requests.get('http://localhost:9200/tweetmaps/tweets/_search', json = payload)
+	r = requests.get('http://52.1.34.124:9200/tweetmaps/tweets/_search', json = payload)
 	return r.text
 
 if __name__ == '__main__':
-	#app.debug = True
+	application.debug = True
 	application.run()

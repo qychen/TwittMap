@@ -1,5 +1,5 @@
 
-var server_url = "http://localhost:5000/"
+var server_url = "http://twittmap.us-east-1.elasticbeanstalk.com/"
 
 // jQuery to collapse the navbar on scroll
 function collapseNavbar() {
@@ -100,7 +100,7 @@ function surround(event) {
 
                 google.maps.event.addListener(marker, 'click', (function(marker, i) {
                     return function() {
-                      contentString = '<div style="color: #333"><p>'+tweets[i]._source.text+'</p></div>';
+                      contentString = '<div style="color: #333"><p>'+tweets[i]._source.username+": "+tweets[i]._source.text+'</p></div>';
                       infowindow.setContent(contentString);
                       infowindow.open(map, marker);
                     }
@@ -123,6 +123,7 @@ function keyword() {
 
     var xmlhttp = new XMLHttpRequest();
     var url = server_url+"search?keyword="+this.text;
+    //var url = server_url+"search?keyword=snow";
 
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -151,7 +152,7 @@ function keyword() {
 
                 google.maps.event.addListener(marker, 'click', (function(marker, i) {
                     return function() {
-                      contentString = '<div style="color: #333"><p>'+tweets[i]._source.text+'</p></div>';
+                      contentString = '<div style="color: #333"><p>'+tweets[i]._source.username+": "+tweets[i]._source.text+'</p></div>';
                       infowindow.setContent(contentString);
                       infowindow.open(map, marker);
                     }
