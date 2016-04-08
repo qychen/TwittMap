@@ -12,7 +12,7 @@ def main_page():
 def search():
 	keyword = request.args.get('keyword')
 	
-	payload = {'query':{'match_phrase':{'text':keyword}}}
+	payload = {"size":1000,'query':{'match_phrase':{'text':keyword}}}
 	r = requests.get('http://52.1.34.124:9200/tweetmaps/tweets/_search', json = payload)
 	return r.text
 
