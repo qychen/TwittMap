@@ -14,6 +14,8 @@ class MyStreamListener(tweepy.StreamListener):
             payload['location'] = status.coordinates['coordinates']
             payload['created_at'] = str(status.created_at)
             response = queue.send_message(MessageBody=json.dumps(payload))
+            print payload['location']
+            print type(payload['location'])
             print(response.get('MessageId'))
             #r = requests.post('http://52.1.34.124:9200/tweetmaps/tweets', json = payload)
             #print r.text
@@ -42,6 +44,6 @@ print(queue.attributes.get('DelaySeconds'))
 
 while True:
 	try:
-		myStream.filter(track=["cloud", "snow", "election", "NBA"])
+		myStream.filter(track=["cloud", "snow", "coffee", "NBA", "python"])
 	except:
 		continue
