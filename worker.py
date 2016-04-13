@@ -19,7 +19,9 @@ class workerThread(threading.Thread):
     def run(self): #Overwrite run() method, put the function here  
         while not self.thread_stop:  
             data = {}
-            data['apikey'] = 'd8d93e94d6a8f768cf2fb1c14cf24c7f3812f121'
+            #data['apikey'] = 'd8d93e94d6a8f768cf2fb1c14cf24c7f3812f121'
+            #data['apikey'] = 'a52143eb1c30afba87bd891a49862e698ef72d3f'
+            data['apikey'] = '31cee1ecc78de13ca4020d3a45387decf2e3e638'
             data['text'] = self.message
             data['outputMode'] = 'json'
             
@@ -39,7 +41,7 @@ class workerThread(threading.Thread):
             
             Ans = json.dumps(Ansdata)
             print Ans
-            url = 'http://a3a175ba.ngrok.io/sns'
+            url = 'http://04da0beb.ngrok.io/sns'
             r = requests.post(url, json = Ans)
             print r.text
 
@@ -53,18 +55,17 @@ queue = sqs.get_queue_by_name(QueueName='tweets')
 
 while True:
 	# Process messages by printing out body and optional author name
-	try:
-		message = queue.receive_messages(MessageAttributeNames=['Author'])[0]
-		print message.body
-		messageJson = json.loads(message.body)
-		messageStr = messageJson['text'].encode('unicode_escape')
+    try:
+    	message = queue.receive_messages(MessageAttributeNames=['Author'])[0]
+    	print message.body
+    	messageJson = json.loads(message.body)
+    	messageStr = messageJson['text'].encode('unicode_escape')
 
-		t1 = workerThread(messageStr, message)
-		t1.start()
-		    
-		message.delete()
-	except:
-		continue
+    	t1 = workerThread(messageStr, message)
+    	t1.start()
+    	message.delete()
+    except:
+    	continue
 
 
 

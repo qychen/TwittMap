@@ -1,5 +1,5 @@
 
-var server_url = "http://twittmap-env.us-east-1.elasticbeanstalk.com/"
+var server_url = "http://04da0beb.ngrok.io/"
 
 // jQuery to collapse the navbar on scroll
 function collapseNavbar() {
@@ -63,7 +63,26 @@ function init() {
 }
 
 var markers = [];
-var image = '/static/img/map-marker.png';
+var icons = {
+  positive: {
+    icon: {
+        url: '/static/img/marker_r.png', // url
+        scaledSize: new google.maps.Size(20, 35) // scaled size
+    }
+  },
+  negative: {
+    icon: {
+        url: '/static/img/marker_b.png', // url
+        scaledSize: new google.maps.Size(20, 35) // scaled size
+    }
+  },
+  neutral: {
+    icon: {
+        url: '/static/img/marker_g.png', // url
+        scaledSize: new google.maps.Size(20, 35) // scaled size
+    }
+  }
+};
 
 function surround(event) {
     var latitude = event.latLng.lat();
@@ -94,6 +113,7 @@ function surround(event) {
                 myLatLng = new google.maps.LatLng(ts.location[1], ts.location[0]);
                 var marker = new google.maps.Marker({
                     position: myLatLng,
+                    icon: icons[ts.sentiment].icon,
                     map: map,
                     animation: google.maps.Animation.DROP,
                 });
@@ -122,6 +142,8 @@ $(".keyword").click(keyword);
 
 function keyword() {
 
+    document.getElementById("drop").innerHTML = this.text;
+
     var xmlhttp = new XMLHttpRequest();
     var url = server_url+"search?keyword="+this.text;
     //var url = server_url+"search?keyword=snow";
@@ -147,6 +169,7 @@ function keyword() {
                 myLatLng = new google.maps.LatLng(ts.location[1], ts.location[0]);
                 var marker = new google.maps.Marker({
                     position: myLatLng,
+                    icon: icons[ts.sentiment].icon,
                     map: map,
                     animation: google.maps.Animation.DROP,
                 });
@@ -168,5 +191,61 @@ function keyword() {
     xmlhttp.send();
 
 }
+
+var eventOutputContainer = document.getElementById("event");
+var evtSrc = new EventSource("/subscribe");
+var new_tweets = [];
+
+evtSrc.onmessage = function(e) {
+    console.log(e.data);
+    new_tweets.push(e.data);
+    eventOutputContainer.innerHTML = new_tweets.length;
+}
+
+$("#show").click(function(){
+    tweets = [];
+    for (i=0;i<new_tweets.length;i++){
+        tweets[i] = JSON.parse(new_tweets[i]);
+    }
+    //tweets = new_tweets;
+    console.log(tweets);
+    
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    markers = [];
+
+    var infowindow = new google.maps.InfoWindow();
+
+    for (i=0;i<tweets.length;i++){
+
+        //create marker and text for each point
+        ts = tweets[i];
+        //console.log(ts.text);
+        myLatLng = new google.maps.LatLng(ts.location[1], ts.location[0]);
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            icon: icons[ts.sentiment].icon,
+            map: map,
+            animation: google.maps.Animation.DROP,
+        });
+
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+              contentString = '<div style="color: #333"><p>'+tweets[i].username+": "+tweets[i].text+'</p></div>';
+              contentString += '<div style="color: #333"><p>'+tweets[i].created_at+'</p></div>';
+              infowindow.setContent(contentString);
+              infowindow.open(map, marker);
+            }
+        })(marker, i));
+
+        markers.push(marker);
+    }
+
+    eventOutputContainer.innerHTML = 0;
+    new_tweets = [];
+
+})
+
 
 

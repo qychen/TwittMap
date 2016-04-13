@@ -1,8 +1,33 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 import requests
 import json
 
+import gevent
+from gevent.wsgi import WSGIServer
+from gevent.queue import Queue
+
+class ServerSentEvent(object):
+
+    def __init__(self, data):
+        self.data = data
+        self.event = None
+        self.id = None
+        self.desc_map = {
+            self.data : "data",
+            self.event : "event",
+            self.id : "id"
+        }
+
+    def encode(self):
+        if not self.data:
+            return ""
+        lines = ["%s: %s" % (v, k) 
+                 for k, v in self.desc_map.iteritems() if k]
+        
+        return "%s\n\n" % "\n".join(lines)
+
 application = Flask(__name__)
+subscriptions = []
 
 @application.route('/')
 def main_page():
@@ -13,7 +38,7 @@ def search():
 	keyword = request.args.get('keyword')
 	
 	payload = {"size":1000,'query':{'match_phrase':{'text':keyword}}}
-	r = requests.get('http://52.200.219.3:9200/tweetmaps/tweets/_search', json = payload)
+	r = requests.get('http://52.200.219.3:9200/tweetspart2/tweets/_search', json = payload)
 	return r.text
 
 @application.route('/surround')
@@ -36,23 +61,43 @@ def surround():
 	    }
 	  }
 	}
-	r = requests.get('http://52.200.219.3:9200/tweetmaps/tweets/_search', json = payload)
+	r = requests.get('http://52.200.219.3:9200/tweetspart2/tweets/_search', json = payload)
 	return r.text
 
 @application.route('/sns', methods=['POST'])
 def sns():
-	a = eval(request.data)
-	req = json.loads(a)
-	print req['location']
-	print type(req['location'])
-	print json.loads(eval(request.data))
-	r = requests.post('http://52.200.219.3:9200/tweetspart2/tweets', json = json.loads(eval(request.data)))
+	message = eval(request.data)
+	#print json.loads(eval(request.data))
+	r = requests.post('http://52.200.219.3:9200/tweetspart2/tweets', json = json.loads(message))
 	print r.text
+
+	def notify():
+		msg = message
+		for sub in subscriptions[:]:
+			sub.put(msg)
+
+	gevent.spawn(notify)
 	return ('', 200)
+
+@application.route("/subscribe")
+def subscribe():
+    def gen():
+        q = Queue()
+        subscriptions.append(q)
+        try:
+            while True:
+                result = q.get()
+                ev = ServerSentEvent(str(result))
+                yield ev.encode()
+        except GeneratorExit: # Or maybe use flask signals
+            subscriptions.remove(q)
+
+    return Response(gen(), mimetype="text/event-stream")
 
 if __name__ == '__main__':
 	application.debug = True
-	application.run()
+	server = WSGIServer(("", 5000), application)
+	server.serve_forever()
 
 
 

@@ -44,6 +44,6 @@ print(queue.attributes.get('DelaySeconds'))
 
 while True:
 	try:
-		myStream.filter(track=["cloud", "snow", "coffee", "NBA", "python"])
+		myStream.filter(track=["coffee", "cloud", "python", "java", "google"])
 	except:
 		continue
