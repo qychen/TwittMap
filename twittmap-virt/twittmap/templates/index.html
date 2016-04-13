@@ -85,24 +85,27 @@
     <!-- About Section -->
     <section id="about" class="container content-section text-center full-screen">
         <div class="text_drop">
-        <div class="row">
-            <div class="col-lg-10 col-lg-offset-1">
-                <p>Choose a keyword, or just click on the map to see the surrounding tweets</p>
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1">
+                    <p>Choose a keyword, or just click on the map to see the surrounding tweets</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Dropdown -->
-        <div class="dropdown">
-          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">CHOOSE YOUR KEYWORD
-          <span class="caret"></span></button>
-          <ul class="dropdown-menu">
-            <li><a class="keyword" style="cursor: pointer">cloud</a></li>
-            <li><a class="keyword" style="cursor: pointer">election</a></li>
-            <li><a class="keyword" style="cursor: pointer">coffee</a></li>
-            <li><a class="keyword" style="cursor: pointer">snow</a></li>
-            <li><a class="keyword" style="cursor: pointer">NBA</a></li>
-          </ul>
-        </div>
+            <!-- Dropdown -->
+            <div class="dropdown">
+              <button id="drop" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">CHOOSE YOUR KEYWORD
+              <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a class="keyword" style="cursor: pointer">cloud</a></li>
+                <li><a class="keyword" style="cursor: pointer">google</a></li>
+                <li><a class="keyword" style="cursor: pointer">java</a></li>
+                <li><a class="keyword" style="cursor: pointer">snow</a></li>
+                <li><a class="keyword" style="cursor: pointer">NBA</a></li>
+              </ul>
+            </div>
+            <label style="padding-left: 20px">New Tweets Arrived:</label>
+            <div id="event" style="display: inline;padding-right: 20px">0</div>
+            <button id="show" class="btn btn-primary" type="button" style="display: inline;width: 285px">SHOW ON THE MAP</button>
         </div>
 
         <!-- Map -->
